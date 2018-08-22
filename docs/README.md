@@ -13,7 +13,6 @@ Operating System : MacOS High Sierra.
 Install the set of dependencies : <br />
 ```
 pip install -r requirements.txt
-
 ```
 
 ## Authors
