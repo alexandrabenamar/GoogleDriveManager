@@ -40,7 +40,19 @@ def search_file(drive_service, FILE_NAME):
     else:
         for item in items:
             if (str(FILE_NAME).lower() in str(item['name']).lower()):
-                webbrowser.open(item['webViewLink'])
+                return(item)
+
+def open_file(drive_service, FILE_NAME):
+    """
+        Open a file from Google Drive.
+            # FILE_NAME: name or keyword of the file to be opened.
+    """
+    item=search_file(drive_service, FILE_NAME)
+    if item!=None:
+        webbrowser.open(item['webViewLink'])
+        return("Le fichier %s a été correctement ouvert." %str(item['name']))
+    else:
+        return("Je n'ai pas trouvé de fichier contenant %s." %FILE_NAME)
 
 
 def upload_file(drive_service, FILE_PATH, MIME_TYPE):
