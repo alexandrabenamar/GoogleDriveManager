@@ -10,27 +10,38 @@ from oauth2client import file, client, tools
 from oauth2client.client import OAuth2WebServerFlow
 
 from httplib2 import Http
+import webbrowser
 import io
 
-
-def file_list():
+def drive_credentials():
     """
-        Function provided by Drive v3 API.
-            - Shows basic usage of the Drive v3 API.
-            - Prints the names and ids of the first 10 files the user has access to.
+        Get credentials and build the Google Drive service.
     """
+    SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/drive.metadata']
+    CREDENTIAL_PATH = './credentials/credentials.json'
+    store = file.Storage('token.json')
+    creds = store.get()
+    if not creds or creds.invalid:
+        flow = client.flow_from_clientsecrets(CREDENTIAL_PATH, SCOPES)
+        creds = tools.run_flow(flow, store)
+    drive_service = build('drive', 'v3', http=creds.authorize(Http()))
+    return drive_service
 
-    # Call the Drive v3 API
-    results = DRIVE.files().list(
-        pageSize=10, fields="nextPageToken, files(id, name)").execute()
+
+def search_file(FILE_NAME):
+    """
+        Search and open a file from Google Drive.
+            # FILE_NAME: name of the file to be searched for or keyword contained in it.
+    """
+    results = DRIVE.files().list(fields="nextPageToken,files(id, name, webViewLink)").execute()
     items = results.get('files', [])
 
     if not items:
         print('No files found.')
     else:
-        print('Files:')
         for item in items:
-            print('{0} ({1})'.format(item['name'], item['id']))
+            if (FILE_NAME in item['name']):
+                webbrowser.open(item['webViewLink'])  # Go to item['webViewLink']
 
 def upload(FILE_PATH, MIME_TYPE):
     """
@@ -74,15 +85,5 @@ def download_file(FILE_ID, MIME_TYPE, FILENAME):
 
 
 if __name__ == '__main__':
-    SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/drive.metadata']
-    CREDENTIAL_PATH = './credentials/credentials.json'
-    store = file.Storage('token.json')
-    creds = store.get()
-    if not creds or creds.invalid:
-        flow = client.flow_from_clientsecrets(CREDENTIAL_PATH, SCOPES)
-        creds = tools.run_flow(flow, store)
-    DRIVE = build('drive', 'v3', http=creds.authorize(Http()))
-    files = DRIVE.files().list().execute()
-    for f in files['files']:
-        print(f['id'], f['mimeType'], f['name'])
-        download_file(f['id'], f['mimeType'], f['name'])
+    DRIVE = drive_credentials()
+    # apply funtion
