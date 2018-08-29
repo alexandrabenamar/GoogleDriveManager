@@ -26,7 +26,6 @@ def drive_credentials():
     return drive_service
 
 
-
 def search_file(drive_service, FILE_NAME):
     """
         Search and open a file from Google Drive.
@@ -37,10 +36,12 @@ def search_file(drive_service, FILE_NAME):
 
     if not items:
         print('No file named %s was found' %FILE_NAME)
+        return
     else:
         for item in items:
             if (str(FILE_NAME).lower() in str(item['name']).lower()):
                 return(item)
+
 
 def open_file(drive_service, FILE_NAME):
     """
@@ -53,6 +54,20 @@ def open_file(drive_service, FILE_NAME):
         return("Le fichier %s a été correctement ouvert." %str(item['name']))
     else:
         return("Je n'ai pas trouvé de fichier contenant %s." %FILE_NAME)
+
+
+def share_file(drive_service, file_name, mailadress, role):
+    """
+        Share a Google Drive file with a user.
+            # FILE_NAME: name or keyword of the file to be searched for.
+            x mailadress = mail adress of the user you want to share a file with
+            x role = the role granted by this permission (organizer, owner
+                     writer, commenter or reader)
+    """
+    item=search_file(drive_service, FILE_NAME)
+    drive_service.permissions().create(body={"role":role, "type":"user",
+                    "emailAddress":mailadress, "sendNotificationEmail":True},
+                    fileId=item['id']).execute()
 
 
 def upload_file(drive_service, FILE_PATH, MIME_TYPE):
