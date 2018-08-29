@@ -1,5 +1,5 @@
 # GoogleDriveManager
-Easily upload, download and open files using Google Drive API.
+Easily upload, download, open and share files using Google Drive API.
 
 ## Implementation
 
