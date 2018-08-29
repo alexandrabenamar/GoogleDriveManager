@@ -26,45 +26,45 @@ def drive_credentials():
     return drive_service
 
 
-def search_file(drive_service, FILE_NAME):
+def search_file(drive_service, file_name):
     """
         Search and open a file from Google Drive.
-            # FILE_NAME: name of the file to be searched for or keyword contained in it.
+            # file_name: name of the file to be searched for or keyword contained in it.
     """
     results = drive_service.files().list(fields="nextPageToken, files(id, name, webViewLink)").execute()
     items = results.get('files', [])
 
     if not items:
-        print('No file named %s was found' %FILE_NAME)
+        print('No file named %s was found' %file_name)
         return
     else:
         for item in items:
-            if (str(FILE_NAME).lower() in str(item['name']).lower()):
+            if (str(file_name).lower() in str(item['name']).lower()):
                 return(item)
 
 
-def open_file(drive_service, FILE_NAME):
+def open_file(drive_service, file_name):
     """
         Open a file from Google Drive.
-            # FILE_NAME: name or keyword of the file to be opened.
+            # file_name: name or keyword of the file to be opened.
     """
-    item=search_file(drive_service, FILE_NAME)
+    item=search_file(drive_service, file_name)
     if item!=None:
         webbrowser.open(item['webViewLink'])
         return("Le fichier %s a été correctement ouvert." %str(item['name']))
     else:
-        return("Je n'ai pas trouvé de fichier contenant %s." %FILE_NAME)
+        return("Je n'ai pas trouvé de fichier contenant %s." %file_name)
 
 
 def share_file(drive_service, file_name, mailadress, role):
     """
         Share a Google Drive file with a user.
-            # FILE_NAME: name or keyword of the file to be searched for.
+            # file_name: name or keyword of the file to be searched for.
             x mailadress = mail adress of the user you want to share a file with
             x role = the role granted by this permission (organizer, owner
                      writer, commenter or reader)
     """
-    item=search_file(drive_service, FILE_NAME)
+    item=search_file(drive_service, file_name)
     drive_service.permissions().create(body={"role":role, "type":"user",
                     "emailAddress":mailadress, "sendNotificationEmail":True},
                     fileId=item['id']).execute()
@@ -86,7 +86,7 @@ def upload_file(drive_service, FILE_PATH, MIME_TYPE):
     print('File ID: %s' % file_service.get('id'))
 
 
-def download_file(drive_service, FILE_ID, MIME_TYPE, FILENAME):
+def download_file(drive_service, FILE_ID, MIME_TYPE, file_name):
     """
         Download a file from Google Drive.
             x FILE_ID : id of the file on Google Drive
@@ -102,7 +102,7 @@ def download_file(drive_service, FILE_ID, MIME_TYPE, FILENAME):
                             mimeType="text/csv")
     else:
         request = drive_service.files().get_media(fileId=FILE_ID)
-    fh = io.FileIO(FILENAME, 'wb')
+    fh = io.FileIO(file_name, 'wb')
     downloader = MediaIoBaseDownload(fh, request)
     done = False
     while done is False:
