@@ -9,6 +9,8 @@ from googleapiclient.http import MediaFileUpload, MediaIoBaseDownload
 from oauth2client import file, client, tools
 from oauth2client.client import OAuth2WebServerFlow
 
+from spreadsheet import getemailadress
+
 from httplib2 import Http
 import io
 import webbrowser
@@ -65,6 +67,11 @@ def share_file(drive_service, file_name, mailadress, role):
                      writer, commenter or reader)
     """
     item=search_file(drive_service, file_name)
+    if "@" not in mailadress:
+        mailadress=getemailadress(item, mailadress.lower())
+    if mailadress==None:
+        return("Je n'ai pas trouvé l'utilisateur.")
+
     drive_service.permissions().create(body={"role":role, "type":"user",
                     "emailAddress":mailadress, "sendNotificationEmail":True},
                     fileId=item['id']).execute()
